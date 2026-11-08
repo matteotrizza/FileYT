@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Script AutoHotkey con interfaccia: errore relativo e velocità | Tutorial Express</title>
+<meta name="description" content="Uno script AutoHotkey con una piccola interfaccia grafica che calcola l'errore relativo e la velocità a partire dai valori inseriti.">
+<link rel="stylesheet" href="assets/guida.css?v=6">
+</head>
+<body>
+
+<main>
+  <a class="etichetta" href="https://tutorialexpress.it"><img src="assets/banner.png" alt="Tutorial Express" width="1300" height="192"></a>
+
+  <h1>Script AutoHotkey con interfaccia: errore relativo e velocità</h1>
+  <p>Lo script apre una finestra con due caselle, <strong>Errore relativo</strong> e <strong>Velocità</strong>. Per ogni calcolo selezionato chiede i valori e mostra il risultato.</p>
+
+  <h2>Cosa serve</h2>
+  <ul>
+    <li>AutoHotkey <strong>v1.1</strong>: lo script usa la sintassi della versione 1 e con la versione 2 non parte</li>
+  </ul>
+
+  <h2>Come usarlo</h2>
+  <ol>
+    <li>Copia il codice qui sotto</li>
+    <li>Incollalo nel Blocco note e salvalo con estensione <code>.ahk</code>, ad esempio <code>fisica.ahk</code></li>
+    <li>Fai doppio clic sul file</li>
+  </ol>
+
+  <h2>Il codice</h2>
+  <pre><code>Gui, Add, Checkbox, vRelativo, Errore relativo
+Gui, Add, Checkbox, vSpeed, Velocita'
+Gui, Add, Button, Default w80, Ok
+Gui, Show, W380 H200, Elaborazione dati | Fisica
+return
+
+ButtonOk:
+Gui, Submit, NoHide
+Gui, Destroy
+
+if (Relativo = 1)
+{
+    InputBox, Value, Inserisci valore | Errore relativo, Inserisci il valore rilevato:
+    if (ErrorLevel)
+    {
+        ExitApp
+    }
+    InputBox, Sens, Inserisci sensibilita' | Errore relativo, Inserisci la sensibilita':
+    if (ErrorLevel)
+    {
+        ExitApp
+    }
+    ans := Sens/Value
+    MsgBox % "L'errore relativo e' " . ans
+}
+
+if (Speed = 1)
+{
+    InputBox, Spazio, Inserisci valore | Velocita', Inserisci la differenza di spazio rilevato:
+    if (ErrorLevel)
+    {
+        ExitApp
+    }
+    InputBox, Tempo, Inserisci valore | Velocita', Inserisci la differenza di tempo:
+    if (ErrorLevel)
+    {
+        ExitApp
+    }
+    ans := Spazio/Tempo
+    MsgBox % "La velocita' ottenuta e' di " . ans . " m/s"
+}</code></pre>
+
+  <footer>Ultimo aggiornamento: febbraio 2024</footer>
+</main>
+
+<script src="assets/copia.js"></script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Server AI in casa: i comandi per Ollama e Open WebUI | Tutorial Express</title>
+<meta name="description" content="I comandi per esporre Ollama sulla rete di casa e installare Open WebUI con Docker, su Windows e macOS.">
+<link rel="stylesheet" href="assets/guida.css?v=6">
+</head>
+<body>
+
+<main>
+  <a class="etichetta" href="https://tutorialexpress.it"><img src="assets/banner.png" alt="Tutorial Express" width="1300" height="192"></a>
+
+  <h1>Server AI in casa: i comandi</h1>
+  <p>Ollama esposto sulla rete di casa, più Open WebUI come interfaccia. Porte usate: <strong>11434</strong> (Ollama) e <strong>3000</strong> (Open WebUI).</p>
+
+  <hr>
+
+  <h2>Windows</h2>
+  <p>PowerShell <strong>come amministratore</strong>.</p>
+
+  <h3>1. Dire a Ollama di ascoltare tutta la rete</h3>
+  <pre><code>[Environment]::SetEnvironmentVariable('OLLAMA_HOST','0.0.0.0','Machine')
+[Environment]::SetEnvironmentVariable('OLLAMA_KEEP_ALIVE','-1','Machine')</code></pre>
+  <p><code>OLLAMA_HOST</code> apre Ollama alle richieste che arrivano dagli altri dispositivi. <code>OLLAMA_KEEP_ALIVE</code> a <code>-1</code> tiene il modello in memoria video: senza, dopo qualche minuto viene scaricato e ogni domanda lo fa ricaricare da capo.</p>
+
+  <h3>2. Riavviare Ollama</h3>
+  <p>Chiudilo dalla barra delle applicazioni (freccia per le icone nascoste, tasto destro, esci) e riavvialo.</p>
+
+  <h3>3. Verificare che stia ascoltando</h3>
+  <pre><code>netstat -ano | findstr 11434</code></pre>
+  <p>Deve comparire una riga con <code>TCP  0.0.0.0:11434</code>. Se compare <code>127.0.0.1:11434</code> la variabile non ha avuto effetto: controlla di aver riavviato Ollama.</p>
+
+  <h3>4. Aprire le porte nel firewall</h3>
+  <pre><code>New-NetFirewallRule -DisplayName "Ollama" -Direction Inbound -LocalPort 11434 -Protocol TCP -Action Allow
+New-NetFirewallRule -DisplayName "Open WebUI" -Direction Inbound -LocalPort 3000 -Protocol TCP -Action Allow</code></pre>
+
+  <h3>5. Docker Desktop e WSL</h3>
+  <p>Verifica prima che la virtualizzazione sia attiva: Gestione attività, Prestazioni, CPU, voce Virtualizzazione. Se è disattivata si abilita dal BIOS.</p>
+  <p>Se Docker chiede WSL:</p>
+  <pre><code>wsl --install</code></pre>
+  <p><strong>Riavvia il computer</strong> prima di avviare Docker: l'installazione di WSL richiede il riavvio per caricare driver e servizi di virtualizzazione.</p>
+
+  <h3>6. Installare Open WebUI</h3>
+  <pre><code>docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main</code></pre>
+  <p>Poi apri <code>http://localhost:3000</code>. <strong>Il primo account che registri è quello di amministratore</strong>, quindi segnati la password.</p>
+
+  <hr>
+
+  <h2>macOS</h2>
+  <p>Terminale.</p>
+
+  <h3>1. Dire a Ollama di ascoltare tutta la rete</h3>
+  <pre><code>launchctl setenv OLLAMA_HOST "0.0.0.0"
+launchctl setenv OLLAMA_KEEP_ALIVE "-1"</code></pre>
+
+  <h3>2. Riavviare Ollama</h3>
+  <p>Esci da Ollama dalla barra dei menu in alto e riaprilo.</p>
+
+  <h3>3. Verificare che stia ascoltando</h3>
+  <pre><code>lsof -iTCP:11434 -sTCP:LISTEN</code></pre>
+
+  <h3>4. Firewall</h3>
+  <p>Su macOS il firewall è disattivato di default e non serve fare niente. Se lo hai acceso, autorizza Ollama quando il sistema lo chiede.</p>
+
+  <h3>5. Installare Open WebUI</h3>
+  <p>Stesso comando di Windows, con Docker Desktop per Mac installato:</p>
+  <pre><code>docker run -d -p 3000:8080 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main</code></pre>
+
+  <h3>Attenzione: le variabili non sopravvivono al riavvio</h3>
+  <p><code>launchctl setenv</code> vale solo per la sessione corrente. Per renderle permanenti serve un LaunchAgent, cioè un file <code>~/Library/LaunchAgents/com.ollama.env.plist</code> con dentro le due variabili, caricato con <code>launchctl load</code>.</p>
+
+  <footer>Ultimo aggiornamento: settembre 2026</footer>
+</main>
+
+<script src="assets/copia.js"></script>
+</body>
+</html>

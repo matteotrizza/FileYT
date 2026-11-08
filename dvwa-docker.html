@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Installare DVWA su Docker in Windows | Tutorial Express</title>
 <meta name="description" content="Come installare DVWA su Windows partendo da zero: Docker Desktop, download di DVWA e avvio del container, comando per comando.">
-<link rel="stylesheet" href="assets/guida.css?v=5">
+<link rel="stylesheet" href="assets/guida.css?v=6">
 </head>
 <body>
 
@@ -79,20 +79,6 @@
   <footer>Ultimo aggiornamento: novembre 2026</footer>
 </main>
 
-<script>
-  document.querySelectorAll('pre').forEach(function (pre) {
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'copia';
-    btn.textContent = 'Copia';
-    btn.addEventListener('click', function () {
-      navigator.clipboard.writeText(pre.querySelector('code').textContent).then(function () {
-        btn.textContent = 'Copiato';
-        setTimeout(function () { btn.textContent = 'Copia'; }, 1500);
-      });
-    });
-    pre.appendChild(btn);
-  });
-</script>
+<script src="assets/copia.js"></script>
 </body>
 </html>

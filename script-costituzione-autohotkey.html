@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Script AutoHotkey: inserire gli articoli della Costituzione | Tutorial Express</title>
+<meta name="description" content="Uno script AutoHotkey che chiede il numero di un articolo della Costituzione e ne scrive il testo al posto tuo.">
+<link rel="stylesheet" href="assets/guida.css?v=6">
+</head>
+<body>
+
+<main>
+  <a class="etichetta" href="https://tutorialexpress.it"><img src="assets/banner.png" alt="Tutorial Express" width="1300" height="192"></a>
+
+  <h1>Script AutoHotkey: inserire gli articoli della Costituzione</h1>
+  <p>Lo script chiede il numero di un articolo della Costituzione e ne scrive il testo nella finestra attiva. Contiene i primi tre articoli: con un numero diverso si chiude senza scrivere niente.</p>
+
+  <h2>Cosa serve</h2>
+  <ul>
+    <li>AutoHotkey <strong>v1.1</strong>: lo script usa la sintassi della versione 1 e con la versione 2 non parte</li>
+  </ul>
+
+  <h2>Come usarlo</h2>
+  <ol>
+    <li>Copia il codice qui sotto</li>
+    <li>Incollalo nel Blocco note e salvalo con estensione <code>.ahk</code>, scegliendo la codifica <strong>UTF-8 con BOM</strong>: senza, le lettere accentate escono sbagliate</li>
+    <li>Metti il cursore nel campo di testo dove vuoi l'articolo, poi avvia lo script</li>
+    <li>Scrivi il numero dell'articolo e premi OK</li>
+  </ol>
+
+  <h2>Il codice</h2>
+  <pre><code>InputBox, Scelta, Costituzione picker, Digita il numero dell'articolo della Costituzione che vuoi inserire nel campo di testo. Se esso non corrisponde ad un articolo il programma verra' terminato automaticamente.
+if(Scelta = 1 || Scelta = 01)
+{
+    Send, L'Italia e' una Repubblica democratica, fondata sul lavoro.`nLa sovranita' appartiene al popolo, che la esercita nelle forme e nei limiti della Costituzione.
+}
+if(Scelta = 2 || Scelta = 02)
+{
+    Send, La Repubblica riconosce e garantisce i diritti inviolabili dell'uomo, sia come singolo, sia nelle formazioni sociali ove si svolge la sua personalita', e richiede l'adempimento dei doveri inderogabili di solidarieta' politica, economica e sociale.
+}
+if(Scelta = 3 || Scelta = 03)
+{
+    Send, Tutti i cittadini hanno pari dignita' sociale e sono eguali davanti alla legge, senza distinzione di sesso, di razza, di lingua, di religione, di opinioni politiche, di condizioni personali e sociali.`nE' compito della Repubblica rimuovere gli ostacoli di ordine economico e sociale, che, limitando di fatto la libertà e l'eguaglianza dei cittadini, impediscono il pieno sviluppo della persona umana e l'effettiva partecipazione di tutti i lavoratori all'organizzazione politica, economica e sociale del Paese.
+}</code></pre>
+
+  <footer>Ultimo aggiornamento: febbraio 2024</footer>
+</main>
+
+<script src="assets/copia.js"></script>
+</body>
+</html>
