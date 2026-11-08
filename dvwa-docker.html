@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Installare DVWA su Docker in Windows | Tutorial Express</title>
+<meta name="description" content="Come installare DVWA su Windows partendo da zero: Docker Desktop, download di DVWA e avvio del container, comando per comando.">
+<link rel="stylesheet" href="assets/guida.css?v=5">
+</head>
+<body>
+
+<main>
+  <a class="etichetta" href="https://tutorialexpress.it"><img src="assets/banner.png" alt="Tutorial Express" width="1300" height="192"></a>
+
+  <h1>Installare DVWA su Docker in Windows</h1>
+
+  <h2>Prerequisiti</h2>
+  <ul>
+    <li>Windows 10 22H2 o Windows 11 23H2, o versioni successive, anche Home;</li>
+    <li>8 GB di RAM;</li>
+    <li>Virtualizzazione attiva nel BIOS.</li>
+  </ul>
+
+  <hr>
+
+  <h2>1. Installa WSL</h2>
+  <p>Docker Desktop lo usa per far girare i container. Apri <strong>PowerShell come amministratore</strong> e lancia:</p>
+  <pre><code>wsl --install --no-distribution</code></pre>
+  <p>Al termine riavvia il PC. Se WSL ce l'hai già, il comando si limita ad aggiornarlo.</p>
+
+  <h2>2. Installa Docker Desktop</h2>
+  <p>Apri PowerShell (come utente normale):</p>
+  <pre><code>winget install -e --id Docker.DockerDesktop</code></pre>
+  <p>Se ti chiede di accettare i termini, scrivi <code>Y</code> e premi Invio.</p>
+  <p>Avvia <strong>Docker Desktop</strong> dal menu Start, accetta le condizioni e aspetta che in basso a sinistra compaia <strong><em>Engine running</em></strong> (se non dovesse funzionare, prova innanzitutto a riavviare la macchina).</p>
+  <p>Chiudi e riapri PowerShell, poi controlla che Docker risponda:</p>
+  <pre><code>docker version</code></pre>
+  <pre><code>docker compose version</code></pre>
+
+  <h2>3. Scarica DVWA</h2>
+  <p>Crea una cartella per il laboratorio ed entraci (fallo pure da Esplora File).</p>
+  <p>Dentro la cartella, fai tasto destro su uno spazio vuoto e scegli <strong>Apri nel Terminale</strong>. Su Windows 10 tieni premuto Maiusc mentre fai tasto destro e scegli <strong>Apri finestra di PowerShell qui</strong>. I comandi che seguono vanno lanciati da questa finestra.</p>
+  <p>Scarica il file di configurazione ufficiale di DVWA:</p>
+  <pre><code>curl.exe -L -o compose.yml https://raw.githubusercontent.com/digininja/DVWA/master/compose.yml</code></pre>
+  <p>Scarica le immagini del sito e del database:</p>
+  <pre><code>docker compose pull</code></pre>
+
+  <h2>4. Avvia il container</h2>
+  <pre><code>docker compose up -d</code></pre>
+  <p>Al primo avvio il database impiega qualche secondo a prepararsi.</p>
+
+  <h2>5. Primo accesso</h2>
+  <ol>
+    <li>Apri <a href="http://localhost:4280">http://localhost:4280</a></li>
+    <li>Accedi con utente <code>admin</code> e password <code>password</code></li>
+    <li>Clicca <strong>Create / Reset Database</strong></li>
+    <li>Accedi di nuovo con le stesse credenziali</li>
+    <li>In <strong>DVWA Security</strong> scegli <strong>Low</strong> e conferma con <strong>Submit</strong></li>
+  </ol>
+
+  <hr>
+
+  <h2>Fermarlo e riavviarlo</h2>
+  <p>DVWA riparte da solo ogni volta che apri Docker Desktop. I comandi vanno lanciati dalla cartella del laboratorio.</p>
+  <p>Per fermarlo:</p>
+  <pre><code>docker compose stop</code></pre>
+  <p>Per riavviarlo:</p>
+  <pre><code>docker compose start</code></pre>
+  <p>Per eliminare i container e il database:</p>
+  <pre><code>docker compose down -v</code></pre>
+
+  <h2>Troubleshooting</h2>
+  <ul>
+    <li><strong>"docker" non è riconosciuto:</strong> chiudi e riapri PowerShell dopo l'installazione</li>
+    <li><strong>Docker Desktop segnala la virtualizzazione disattivata:</strong> attivala nel BIOS, la voce si chiama Intel VT-x o AMD-V a seconda del processore</li>
+    <li><strong>La porta 4280 è già occupata:</strong> apri <code>compose.yml</code> e cambia <code>4280</code> con un altro numero, ad esempio <code>4281</code>, poi usa quello nell'indirizzo</li>
+  </ul>
+
+  <footer>Ultimo aggiornamento: novembre 2026</footer>
+</main>
+
+<script>
+  document.querySelectorAll('pre').forEach(function (pre) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'copia';
+    btn.textContent = 'Copia';
+    btn.addEventListener('click', function () {
+      navigator.clipboard.writeText(pre.querySelector('code').textContent).then(function () {
+        btn.textContent = 'Copiato';
+        setTimeout(function () { btn.textContent = 'Copia'; }, 1500);
+      });
+    });
+    pre.appendChild(btn);
+  });
+</script>
+</body>
+</html>

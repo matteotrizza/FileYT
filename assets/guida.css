@@ -1,0 +1,123 @@
+@font-face {
+  font-family: "Gill Sans";
+  src: url("fonts/gillsans.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Gill Sans";
+  src: url("fonts/gillsans-bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light;
+  --bg: #f6f4ef;
+  --text: #000;
+  --muted: #666;
+  --link: #006daa;
+  --accent: #ff4c00;
+  --code-bg: #ebe8e1;
+  --code-line: #d9d5cc;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 17px/1.6 "Gill Sans", "Gill Sans MT", Calibri, "Segoe UI", sans-serif;
+}
+
+/* In cima alla colonna, allineata al margine destro del testo */
+.etichetta {
+  display: block;
+  width: 240px;
+  margin: 0 0 40px auto;
+  line-height: 0;
+}
+
+.etichetta img { width: 100%; height: auto; }
+
+main {
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+}
+
+h1 { margin: 0 0 14px; font-size: 32px; line-height: 1.15; }
+h2 { margin: 40px 0 8px; font-size: 21px; line-height: 1.25; }
+p, ul, ol { margin: 0 0 14px; }
+ul, ol { padding-left: 24px; }
+li { margin-bottom: 4px; }
+
+a { color: var(--link); }
+
+code {
+  padding: .1em .35em;
+  border-radius: 4px;
+  background: var(--code-bg);
+  font: .8em/1.5 ui-monospace, "Cascadia Code", Consolas, Menlo, monospace;
+}
+
+pre {
+  position: relative;
+  margin: 0 0 14px;
+  padding: 14px 76px 14px 16px;
+  border: 1px solid var(--code-line);
+  border-radius: 8px;
+  background: var(--code-bg);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+pre code { padding: 0; background: none; font-size: 14px; }
+
+.copia {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 2px 9px;
+  border: 1px solid var(--code-line);
+  border-radius: 5px;
+  background: var(--bg);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.copia:hover, .copia:focus-visible { border-color: var(--link); color: var(--text); }
+
+hr {
+  margin: 40px 0;
+  border: 0;
+  border-top: 1px solid var(--code-line);
+}
+
+blockquote {
+  margin: 0 0 14px;
+  padding: 2px 0 2px 16px;
+  border-left: 3px solid var(--accent);
+}
+
+blockquote p:last-child { margin-bottom: 0; }
+
+footer {
+  margin-top: 56px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+@media (max-width: 520px) {
+  body { font-size: 16px; }
+  .etichetta { width: 200px; margin-bottom: 28px; }
+  main { padding: 20px 16px 48px; }
+  h1 { font-size: 27px; }
+}
