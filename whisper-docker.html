@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Whisper in Docker: trascrivere audio in testo sul server di casa | Tutorial Express</title>
+<meta name="description" content="I comandi per installare Whisper in Docker e trascrivere audio e video in testo gratis, con o senza scheda video NVIDIA, e come scegliere il modello giusto.">
+<link rel="stylesheet" href="assets/guida.css?v=6">
+<style>
+  mark { padding: 0 .15em; border-radius: 3px; background: #ffd9c7; color: inherit; }
+  table { width: 100%; margin: 0 0 14px; border-collapse: collapse; font-size: 16px; }
+  th, td { padding: 7px 10px 7px 0; border-bottom: 1px solid var(--code-line); text-align: left; vertical-align: top; }
+  th { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<main>
+  <a class="etichetta" href="https://tutorialexpress.it"><img src="assets/banner.png" alt="Tutorial Express" width="1300" height="192"></a>
+
+  <h1>Whisper in Docker: trascrivere audio in testo sul server di casa</h1>
+  <p>Il comando giusto dipende da due cose: se hai una scheda video NVIDIA e quale sistema operativo usi. Il modello dipende dalla potenza del computer.</p>
+
+  <h2>1. Che scheda video hai?</h2>
+  <p><strong>Windows:</strong> Gestione attività, Prestazioni, GPU. Il nome della scheda è in alto a destra.</p>
+  <p><strong>Linux:</strong></p>
+  <pre><code>lspci | grep -i -E "vga|3d"</code></pre>
+  <p>Se compare NVIDIA vai al punto 3, altrimenti al punto 2.</p>
+
+  <hr>
+
+  <h2>2. Senza scheda NVIDIA</h2>
+  <p>Schede AMD o Intel, nessuna scheda video, Raspberry Pi, Mac. Il comando è lo stesso su Windows, Linux e macOS:</p>
+  <pre><code>docker run -d --name whisper --restart unless-stopped -p 9000:9000 -e <mark>ASR_MODEL=medium</mark> -e ASR_ENGINE=faster_whisper -v whisper-cache:/root/.cache onerahmet/openai-whisper-asr-webservice:latest</code></pre>
+  <blockquote><p><strong><code>ASR_MODEL</code> è il punto in cui scegli il modello.</strong> Il valore giusto per il tuo computer è nella <a href="#modello">tabella al punto 4</a>.</p></blockquote>
+
+  <hr>
+
+  <h2>3. Con scheda NVIDIA</h2>
+  <p>Su tutti i sistemi, prima controlla il driver:</p>
+  <pre><code>nvidia-smi</code></pre>
+  <p>In alto a destra compare <strong>CUDA Version</strong>: deve essere <strong>12.9 o superiore</strong>. Se è più bassa, o il comando non viene trovato, aggiorna il driver NVIDIA.</p>
+
+  <h3>Windows</h3>
+  <p>Driver 576 o successivo. Docker Desktop passa già la scheda al container, non serve altro:</p>
+  <pre><code>docker run -d --name whisper --restart unless-stopped --gpus all -p 9000:9000 -e <mark>ASR_MODEL=large-v3</mark> -e ASR_ENGINE=faster_whisper -v whisper-cache:/root/.cache onerahmet/openai-whisper-asr-webservice:latest-gpu</code></pre>
+
+  <h3>Linux</h3>
+  <p>Driver 575 o successivo. In più serve NVIDIA Container Toolkit, che permette a Docker di usare la scheda. Comandi ufficiali NVIDIA per Ubuntu e Debian:</p>
+  <pre><code>curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list</code></pre>
+  <pre><code>sudo apt-get update && sudo apt-get install -y nvidia-container-toolkit</code></pre>
+  <pre><code>sudo nvidia-ctk runtime configure --runtime=docker && sudo systemctl restart docker</code></pre>
+  <p>Poi lo stesso comando di Windows:</p>
+  <pre><code>docker run -d --name whisper --restart unless-stopped --gpus all -p 9000:9000 -e <mark>ASR_MODEL=large-v3</mark> -e ASR_ENGINE=faster_whisper -v whisper-cache:/root/.cache onerahmet/openai-whisper-asr-webservice:latest-gpu</code></pre>
+
+  <blockquote><p>Rispetto al punto 2 cambiano due cose: <code>--gpus all</code> e il tag <code>latest-gpu</code> alla fine. <strong><code>ASR_MODEL</code> si sceglie in base alla memoria della scheda</strong>, che leggi nell'output di <code>nvidia-smi</code> (per esempio <code>8188MiB</code> vuol dire 8 GB).</p></blockquote>
+
+  <hr>
+
+  <h2 id="modello">4. Quale modello scegliere</h2>
+  <p>Più è grande il modello, più è preciso sui nomi propri e sui termini tecnici, ma anche più lento.</p>
+  <table>
+    <thead><tr><th>Il tuo computer</th><th>Valore di <code>ASR_MODEL</code></th></tr></thead>
+    <tbody>
+      <tr><td>Senza NVIDIA, PC vecchio o Raspberry Pi</td><td><code>small</code></td></tr>
+      <tr><td>Senza NVIDIA, PC recente</td><td><code>medium</code></td></tr>
+      <tr><td>NVIDIA con 4 GB di memoria</td><td><code>medium</code></td></tr>
+      <tr><td>NVIDIA con 6 GB o più</td><td><code>large-v3</code></td></tr>
+    </tbody>
+  </table>
+  <p>I valori sono indicativi: se la trascrizione è troppo lenta o si blocca, scendi di un gradino.</p>
+
+  <footer>Ultimo aggiornamento: novembre 2026</footer>
+</main>
+
+<script src="assets/copia.js"></script>
+</body>
+</html>
