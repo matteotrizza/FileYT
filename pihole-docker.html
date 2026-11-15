@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Installare Pi-hole su Docker in Windows | Tutorial Express</title>
+<meta name="description" content="Come installare Pi-hole su Windows con Docker Desktop: download di Docker e del container, avvio, primo accesso e soluzione dei problemi più comuni.">
+<link rel="stylesheet" href="assets/guida.css?v=6">
+<style>
+  mark { padding: 0 .15em; border-radius: 3px; background: #ffd9c7; color: inherit; }
+</style>
+</head>
+<body>
+
+<main>
+  <a class="etichetta" href="https://tutorialexpress.it"><img src="assets/banner.png" alt="Tutorial Express" width="1300" height="192"></a>
+
+  <h1>Installare Pi-hole su Docker in Windows</h1>
+
+  <h2>Prerequisiti</h2>
+  <ul>
+    <li>Windows 10 22H2 o Windows 11 23H2, o versioni successive, anche Home;</li>
+    <li>8 GB di RAM;</li>
+    <li>Virtualizzazione attiva nel BIOS;</li>
+    <li>WSL installato. Se non ce l'hai, apri <strong>PowerShell come amministratore</strong>, lancia il comando qui sotto e riavvia il PC:</li>
+  </ul>
+  <pre><code>wsl --install --no-distribution</code></pre>
+  <p>Se WSL ce l'hai già, il comando si limita ad aggiornarlo.</p>
+
+  <hr>
+
+  <h2>1. Scarica Docker Desktop</h2>
+  <p>Apri PowerShell (come utente normale):</p>
+  <pre><code>winget install -e --id Docker.DockerDesktop</code></pre>
+  <p>Se ti chiede di accettare i termini, scrivi <code>Y</code> e premi Invio.</p>
+  <p>Avvia <strong>Docker Desktop</strong> dal menu Start, accetta le condizioni e aspetta che in basso a sinistra compaia <strong><em>Engine running</em></strong> (se non dovesse funzionare, prova innanzitutto a riavviare la macchina).</p>
+  <p>Chiudi e riapri PowerShell, poi controlla che Docker risponda:</p>
+  <pre><code>docker version</code></pre>
+  <pre><code>docker compose version</code></pre>
+
+  <h2>2. Scarica il container di Pi-hole</h2>
+  <p>Crea la cartella di Pi-hole ed entraci:</p>
+  <pre><code>mkdir $HOME\pihole; cd $HOME\pihole</code></pre>
+  <p>Crea il file di configurazione. Prima di incollarlo, sostituisci <code>CAMBIAMI</code>, evidenziato qui sotto, con la password che vuoi usare per il pannello:</p>
+  <pre><code>@'
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "80:80/tcp"
+      - "443:443/tcp"
+    environment:
+      TZ: 'Europe/Rome'
+      FTLCONF_webserver_api_password: '<mark>CAMBIAMI</mark>'
+      FTLCONF_dns_listeningMode: 'ALL'
+    volumes:
+      - pihole_data:/etc/pihole
+    cap_add:
+      - SYS_NICE
+    restart: unless-stopped
+volumes:
+  pihole_data:
+'@ | Set-Content docker-compose.yml</code></pre>
+  <p>Scarica l'immagine:</p>
+  <pre><code>docker compose pull</code></pre>
+
+  <hr>
+
+  <h2>Esecuzione</h2>
+  <p>Prima di avviarlo, controlla che la porta 53 sia libera. Se questo comando mostra un risultato, la porta è occupata e Pi-hole non partirà (vedi Troubleshooting):</p>
+  <pre><code>Get-NetUDPEndpoint -LocalPort 53</code></pre>
+  <p>Avvia Pi-hole:</p>
+  <pre><code>docker compose up -d</code></pre>
+  <p>Controlla che giri. Il container <code>pihole</code> deve risultare <code>Up</code>, e dopo qualche secondo <code>healthy</code>:</p>
+  <pre><code>docker ps</code></pre>
+  <p>Trova l'IP del PC, alla voce <strong>Indirizzo IPv4</strong>:</p>
+  <pre><code>ipconfig</code></pre>
+  <ol>
+    <li>Apri <code>http://IP_DEL_PC/admin</code>, oppure <a href="http://localhost/admin">http://localhost/admin</a> dallo stesso PC</li>
+    <li>Accedi con la password che hai scelto al punto 2</li>
+  </ol>
+  <p>Assegna al PC un IP fisso nel router, poi imposta quell'IP come DNS su un dispositivo o sul router. Se il PC si spegne, chi usa Pi-hole come DNS smette di navigare.</p>
+
+  <h2>Fermarlo e riavviarlo</h2>
+  <p>Pi-hole riparte da solo ogni volta che apri Docker Desktop. I comandi vanno lanciati dalla cartella <code>pihole</code>:</p>
+  <pre><code>cd $HOME\pihole</code></pre>
+  <p>Per fermarlo:</p>
+  <pre><code>docker compose stop</code></pre>
+  <p>Per riavviarlo:</p>
+  <pre><code>docker compose start</code></pre>
+  <p>Per aggiornarlo all'ultima versione:</p>
+  <pre><code>docker compose pull; docker compose up -d</code></pre>
+  <p>Per eliminare il container e le impostazioni:</p>
+  <pre><code>docker compose down -v</code></pre>
+
+  <h2>Troubleshooting</h2>
+  <ul>
+    <li><strong>"docker" non è riconosciuto:</strong> chiudi e riapri PowerShell dopo l'installazione</li>
+    <li><strong>Docker Desktop segnala la virtualizzazione disattivata:</strong> attivala nel BIOS, la voce si chiama Intel VT-x o AMD-V a seconda del processore</li>
+    <li><strong>La porta 53 è già occupata:</strong> di solito è la Condivisione connessione Internet di Windows. Disattivala da PowerShell come amministratore con <code>Stop-Service SharedAccess; Set-Service SharedAccess -StartupType Disabled</code>, poi rilancia <code>docker compose up -d</code></li>
+    <li><strong>La porta 80 è già occupata:</strong> apri <code>docker-compose.yml</code> e cambia <code>"80:80/tcp"</code> in <code>"8080:80/tcp"</code>, poi apri il pannello su <code>http://IP_DEL_PC:8080/admin</code></li>
+    <li><strong>Gli altri dispositivi non raggiungono Pi-hole:</strong> apri il firewall di Windows. Da PowerShell come amministratore:
+      <pre><code>New-NetFirewallRule -DisplayName "Pi-hole DNS UDP" -Direction Inbound -Protocol UDP -LocalPort 53 -Action Allow</code></pre>
+      <pre><code>New-NetFirewallRule -DisplayName "Pi-hole DNS TCP" -Direction Inbound -Protocol TCP -LocalPort 53 -Action Allow</code></pre>
+    </li>
+    <li><strong>Nella dashboard tutti i dispositivi compaiono come uno solo:</strong> è un limite di Docker Desktop, il blocco funziona lo stesso. Per vederli separati serve Pi-hole su Linux, anche in una macchina virtuale</li>
+    <li><strong>Hai dimenticato la password:</strong> impostane una nuova con <code>docker exec -it pihole pihole setpassword</code></li>
+    <li><strong>Il container non parte:</strong> leggi i log con <code>docker compose logs --tail 50</code></li>
+    <li><strong>Un dispositivo aggira il blocco:</strong> togli il DNS secondario, o rimettici l'IP di Pi-hole. Controlla anche il DNS privato di Android e il DNS sicuro del browser</li>
+  </ul>
+
+  <footer>Ultimo aggiornamento: novembre 2026</footer>
+</main>
+
+<script src="assets/copia.js"></script>
+</body>
+</html>
