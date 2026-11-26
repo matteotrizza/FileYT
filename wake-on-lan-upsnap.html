@@ -34,10 +34,14 @@
   <p>Se non l'hai ancora fatto, disattiva l'avvio rapido. Da PowerShell come amministratore (disattiva anche l'ibernazione):</p>
   <pre><code>powercfg /h off</code></pre>
 
-  <h2>2. Sul server: installa Tailscale</h2>
+  <h2>2. Sul server: installa Tailscale e condividi la rete di casa</h2>
+  <p>Così da fuori casa usi gli stessi indirizzi di quando sei in casa.</p>
   <pre><code>curl -fsSL https://tailscale.com/install.sh | sh</code></pre>
-  <pre><code>sudo tailscale up</code></pre>
-  <p>Apri il link che compare e accedi con lo stesso account che usi sul telefono.</p>
+  <p>Attiva l'inoltro dei pacchetti, necessario per condividere la rete:</p>
+  <pre><code>echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.d/99-tailscale.conf && echo 'net.ipv6.conf.all.forwarding = 1' | sudo tee -a /etc/sysctl.d/99-tailscale.conf && sudo sysctl -p /etc/sysctl.d/99-tailscale.conf</code></pre>
+  <p>Avvia Tailscale condividendo la rete di casa. Usa i primi tre numeri dell'IP del server (lo vedi con <code>hostname -I</code>) seguiti da <code>.0/24</code>:</p>
+  <pre><code>sudo tailscale up --advertise-routes=<mark>192.168.1.0/24</mark></code></pre>
+  <p>Apri il link che compare e accedi con lo stesso account che usi sul telefono. Poi, nel <a href="https://login.tailscale.com/admin/machines">pannello di Tailscale</a>, apri il menu del server, scegli <strong>Edit route settings</strong> e approva la rete.</p>
 
   <h2>3. Sul server: crea il file di UpSnap</h2>
   <p>Se Docker non c'è ancora, installalo con lo script ufficiale:</p>
@@ -87,7 +91,7 @@ EOF</code></pre>
   <h2>7. Accendere il PC da fuori casa</h2>
   <ol>
     <li>Sul telefono attiva Tailscale</li>
-    <li>Nel browser apri <code>http://<mark>NOME_DEL_SERVER</mark>:8090</code>, con il nome che il server ha nell'app Tailscale</li>
+    <li>Nel browser apri <code>http://IP_DEL_SERVER:8090</code>, lo stesso indirizzo che usi in casa</li>
     <li>Accedi e premi il pulsante di accensione del PC</li>
   </ol>
   <p>Fai la prova vera con il Wi-Fi del telefono spento, in rete mobile.</p>
@@ -113,7 +117,7 @@ EOF</code></pre>
       <pre><code>wakeonlan <mark>AA:BB:CC:DD:EE:FF</mark></code></pre>
     </li>
     <li><strong>Si accende dalla sospensione ma non da spento:</strong> avvio rapido ancora attivo, oppure nel BIOS è attiva l'opzione ErP o Deep Sleep, che toglie corrente alla scheda di rete</li>
-    <li><strong>Funziona in casa ma non da fuori:</strong> controlla che Tailscale sia attivo sul telefono e che il server risulti connesso nell'app</li>
+    <li><strong>Funziona in casa ma non da fuori:</strong> controlla che Tailscale sia attivo sul telefono, che il server risulti connesso nell'app e che la rete sia approvata nel pannello di Tailscale. Se sei su un Wi-Fi che usa gli stessi indirizzi di casa (per esempio anche lui <code>192.168.1.x</code>), vince la rete locale: passa alla rete mobile</li>
     <li><strong>Il server è una macchina virtuale e il pacchetto non arriva:</strong> imposta la scheda di rete della VM in modalità bridge, non NAT</li>
     <li><strong>La pagina su <code>:8090</code> non si apre:</strong> controlla la regola del firewall al passaggio 4, poi leggi i log con <code>docker compose logs --tail 50</code></li>
     <li><strong>Dopo un blackout il PC non risponde più:</strong> con alcune schede madri bisogna accenderlo e spegnerlo una volta a mano</li>
