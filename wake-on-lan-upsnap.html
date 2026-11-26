@@ -37,8 +37,7 @@
   <h2>2. Sul server: installa Tailscale</h2>
   <pre><code>curl -fsSL https://tailscale.com/install.sh | sh</code></pre>
   <pre><code>sudo tailscale up</code></pre>
-  <p>Apri il link che compare e accedi con lo stesso account che usi sul telefono. Poi annota l'indirizzo Tailscale del server, quello che inizia con <code>100.</code>:</p>
-  <pre><code>tailscale ip -4</code></pre>
+  <p>Apri il link che compare e accedi con lo stesso account che usi sul telefono.</p>
 
   <h2>3. Sul server: crea il file di UpSnap</h2>
   <p>Se Docker non c'è ancora, installalo con lo script ufficiale:</p>
@@ -88,7 +87,7 @@ EOF</code></pre>
   <h2>7. Accendere il PC da fuori casa</h2>
   <ol>
     <li>Sul telefono attiva Tailscale</li>
-    <li>Nel browser apri <code>http://<mark>100.x.y.z</mark>:8090</code>, con l'indirizzo Tailscale del passaggio 2</li>
+    <li>Nel browser apri <code>http://<mark>NOME_DEL_SERVER</mark>:8090</code>, con il nome che il server ha nell'app Tailscale</li>
     <li>Accedi e premi il pulsante di accensione del PC</li>
   </ol>
   <p>Fai la prova vera con il Wi-Fi del telefono spento, in rete mobile.</p>
@@ -106,8 +105,6 @@ EOF</code></pre>
   <pre><code>docker compose start</code></pre>
   <p>Per aggiornarlo:</p>
   <pre><code>docker compose pull && docker compose up -d</code></pre>
-  <p>Per eliminarlo, insieme a dispositivi e account:</p>
-  <pre><code>docker compose down && sudo rm -rf ~/upsnap/data</code></pre>
 
   <h2>Troubleshooting</h2>
   <ul>
