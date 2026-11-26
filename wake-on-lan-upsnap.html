@@ -117,7 +117,7 @@ EOF</code></pre>
       <pre><code>wakeonlan <mark>AA:BB:CC:DD:EE:FF</mark></code></pre>
     </li>
     <li><strong>Si accende dalla sospensione ma non da spento:</strong> avvio rapido ancora attivo, oppure nel BIOS è attiva l'opzione ErP o Deep Sleep, che toglie corrente alla scheda di rete</li>
-    <li><strong>Funziona in casa ma non da fuori:</strong> controlla che Tailscale sia attivo sul telefono, che il server risulti connesso nell'app e che la rete sia approvata nel pannello di Tailscale. Se sei su un Wi-Fi che usa gli stessi indirizzi di casa (per esempio anche lui <code>192.168.1.x</code>), vince la rete locale: passa alla rete mobile</li>
+    <li><strong>Funziona in casa ma non da fuori:</strong> controlla che Tailscale sia attivo sul telefono, che il server risulti connesso nell'app e che la rete sia approvata nel pannello di Tailscale</li>
     <li><strong>Il server è una macchina virtuale e il pacchetto non arriva:</strong> imposta la scheda di rete della VM in modalità bridge, non NAT</li>
     <li><strong>La pagina su <code>:8090</code> non si apre:</strong> controlla la regola del firewall al passaggio 4, poi leggi i log con <code>docker compose logs --tail 50</code></li>
     <li><strong>Dopo un blackout il PC non risponde più:</strong> con alcune schede madri bisogna accenderlo e spegnerlo una volta a mano</li>
