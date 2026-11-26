@@ -17,10 +17,6 @@
 
   <h1>Wake on LAN da fuori casa con UpSnap e Tailscale</h1>
 
-  <h2>Come funziona</h2>
-  <p>Il magic packet che accende il PC viaggia solo dentro la rete di casa, e Tailscale non lo trasporta. Per questo serve un dispositivo sempre acceso nella stessa rete: dal telefono, con Tailscale, apri UpSnap su quel dispositivo, e il pacchetto lo manda UpSnap.</p>
-  <p><strong>Il magic packet non devi mandarlo tu:</strong> premi il pulsante di accensione in UpSnap e lo invia lui.</p>
-
   <h2>Prerequisiti</h2>
   <ul>
     <li>Il PC da accendere già configurato per il Wake on LAN (BIOS, scheda di rete, avvio rapido disattivato) e collegato al router col cavo;</li>
@@ -72,20 +68,14 @@ EOF</code></pre>
   <pre><code>sudo docker compose up -d</code></pre>
   <p>Controlla che giri. Il container <code>upsnap</code> deve risultare <code>Up</code>:</p>
   <pre><code>sudo docker ps</code></pre>
-
-  <h2>5. Apri la porta nel firewall</h2>
-  <p>Su Ubuntu e derivate il firewall (ufw) può bloccare la porta 8090: il container risulta attivo, ma dagli altri dispositivi la pagina non si apre. Controlla se è attivo:</p>
-  <pre><code>sudo ufw status</code></pre>
-  <p>Se risulta <code>active</code>, apri la porta:</p>
+  <p>Se il firewall del server è attivo, apri la porta 8090, altrimenti la pagina non si apre dagli altri dispositivi:</p>
   <pre><code>sudo ufw allow 8090/tcp</code></pre>
 
-  <h2>6. Crea l'account amministratore</h2>
-  <p>Il server può anche non avere un browser: l'account si crea dal terminale. Sostituisci email e password con le tue:</p>
+  <h2>5. Crea l'account amministratore</h2>
+  <p>Dal terminale del server, con la tua email e una password robusta:</p>
   <pre><code>sudo docker exec upsnap /app/upsnap superuser upsert <mark>tua@email.it</mark> <mark>PasswordRobusta</mark></code></pre>
-  <p>In alternativa, nei log di <code>sudo docker logs upsnap</code> c'è un link per crearlo dal browser: aprilo da un altro PC sostituendo <code>0.0.0.0</code> con l'IP del server. Il link scade dopo circa un'ora.</p>
 
-  <h2>7. Primo accesso e PC da accendere</h2>
-  <p>L'IP del server lo trovi con <code>hostname -I</code>: è il primo della lista, di solito <code>192.168.x.x</code>. Nei log compare <code>0.0.0.0</code>, ma non è un indirizzo da scrivere nel browser.</p>
+  <h2>6. Primo accesso e PC da accendere</h2>
   <ol>
     <li>Da un altro PC di casa apri <code>http://IP_DEL_SERVER:8090</code></li>
     <li>Accedi con l'account appena creato</li>
@@ -93,7 +83,7 @@ EOF</code></pre>
     <li>Salva. Nella dashboard il PC compare acceso o spento, a seconda dello stato</li>
   </ol>
 
-  <h2>8. Accendere il PC da fuori casa</h2>
+  <h2>7. Accendere il PC da fuori casa</h2>
   <ol>
     <li>Sul telefono attiva Tailscale</li>
     <li>Nel browser apri <code>http://<mark>100.x.y.z</mark>:8090</code>, con l'indirizzo Tailscale del passaggio 2</li>
@@ -126,7 +116,7 @@ EOF</code></pre>
     <li><strong>Si accende dalla sospensione ma non da spento:</strong> avvio rapido ancora attivo, oppure nel BIOS è attiva l'opzione ErP o Deep Sleep, che toglie corrente alla scheda di rete</li>
     <li><strong>Funziona in casa ma non da fuori:</strong> controlla che Tailscale sia attivo sul telefono e che il server risulti connesso nell'app</li>
     <li><strong>Il server è una macchina virtuale e il pacchetto non arriva:</strong> imposta la scheda di rete della VM in modalità bridge, non NAT</li>
-    <li><strong>Il container è attivo ma la pagina su <code>:8090</code> non si apre:</strong> quasi sempre è il firewall del server, vedi il passaggio 5. Controlla anche di usare l'IP del server e non <code>0.0.0.0</code>. Se non basta, leggi i log con <code>sudo docker compose logs --tail 50</code></li>
+    <li><strong>La pagina su <code>:8090</code> non si apre:</strong> controlla la regola del firewall al passaggio 4, poi leggi i log con <code>sudo docker compose logs --tail 50</code></li>
     <li><strong>Dopo un blackout il PC non risponde più:</strong> con alcune schede madri bisogna accenderlo e spegnerlo una volta a mano</li>
   </ul>
 
